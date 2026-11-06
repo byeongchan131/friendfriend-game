@@ -84,8 +84,6 @@
         let nickname = '', color = 0, notice = '', screen = 'home', mode = 'create', joinCode = '', rivals = [];
         let nt = null;
 
-        const QLIST = ["가장 좋아하는 음식은?", "가장 좋아하는 색은?", "가장 가고 싶은 여행지는?", "가장 하고 싶은 일은?", "가장 좋아하는 노래는?", "가장 좋아하는 계절은?", "가장 좋아하는 동물은?", "가장 좋아하는 영화는?"];
-
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         function flash(t) {
@@ -104,7 +102,7 @@
             else if (screen === 'code') app.innerHTML = codeView();
             else if (screen === 'profile') app.innerHTML = profileView();
             else if (screen === 'room') app.innerHTML = roomView();
-
+            
             if (notice && screen !== 'room') {
                 const t = document.createElement('div');
                 t.className = 'toast';
@@ -114,7 +112,6 @@
             }
         }
 
-        // --- VIEWS ---
         function header() { return `<div class="topbar"><h1 class="brand">👑 프렌드프렌드</h1><span class="pill">실시간 온라인 · v3</span></div>`; }
         function footer() { return `<p class="muted">최대 ${MAX_PLAYERS}명 · 로그인 없이 참여</p>`; }
 
@@ -218,7 +215,7 @@
         window.goCode = async () => {
             const c = $('#joincode').value.trim().toUpperCase();
             if (!c) return flash('코드를 입력하세요');
-            const s = await roomRef ? null : db.ref('rooms/' + c).once('value');
+            const s = await db.ref('rooms/' + c).once('value');
             if (!s || !s.exists()) return flash('방이 없습니다');
             joinCode = c;
             rivals = Object.values(s.val().players || {});
@@ -257,7 +254,6 @@
                 state = s.val();
                 if (state) {
                     render();
-                    // 참여자가 처음 들어왔을 때 질문 할당
                     if (state.status === 'playing' && state.players[uid] && !state.players[uid].pq) {
                         const q = QLIST[Math.floor(Math.random() * QLIST.length)];
                         roomRef.child('players/' + uid).update({ pq: q });
@@ -285,7 +281,6 @@
                 ts: Date.now()
             });
 
-            // 다음 질문 미리 할당
             const nextQ = QLIST[Math.floor(Math.random() * QLIST.length)];
             await roomRef.child('players/' + uid).update({ pq: nextQ });
             await roomRef.update({ lastActive: Date.now() });
@@ -313,6 +308,10 @@
             await roomRef.child('queue').child(qid).remove();
             await roomRef.update({ lastActive: Date.now() });
             render();
+        };
+
+        window.startGame = async () => {
+            await roomRef.update({ status: 'playing', lastActive: Date.now() });
         };
 
         window.endGame = async () => {
