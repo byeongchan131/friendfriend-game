@@ -1,11 +1,11 @@
-// Firebase Console > 프로젝트 설정 > 내 앱 > SDK 설정에서 복사한 값으로 바꾸세요.
-// 이 값은 웹에 공개되는 설정값입니다. 비밀번호나 서비스 계정 키는 절대 넣지 마세요.
+// Firebase 웹 설정값 (공개되어도 되는 값입니다. 비밀번호나 서버 키가 아닙니다.)
 window.FRIENDFRIEND_FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_DATABASE_NAME-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDWuTPykhwet00n73D8MniG4YdXaX9xxBA",
+  authDomain: "friendfriend-game.firebaseapp.com",
+  databaseURL: "https://friendfriend-game-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "friendfriend-game",
+  storageBucket: "friendfriend-game.firebasestorage.app",
+  messagingSenderId: "117702808644",
+  appId: "1:117702808644:web:10148d6d3f7c9cfaaa9811",
+  measurementId: "G-F89B59XPT1"
 };
