@@ -1,297 +1,355 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<title>프렌드프렌드</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#fbf3df;--bg2:#f1deb0;--ink:#2a1216;--red:#941f35;--gold:#d9a233;--card:#fffaf0;--green:#24784d;--line:#e7d5ae;box-sizing:border-box}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(145deg,var(--bg),var(--bg2));color:var(--ink);font:16px/1.55 'Gowun Dodum',sans-serif}button,input,textarea,select{font:inherit}button{border:0;border-radius:12px;padding:11px 16px;background:var(--red);color:#fff8e8;cursor:pointer;font-weight:700;box-shadow:0 3px 0 #5f1425;transition:transform .08s,opacity .15s}button:active{transform:translateY(2px);box-shadow:0 1px 0 #5f1425}button:disabled{opacity:.42;cursor:not-allowed;transform:none}input,textarea,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;background:#fffdf7;color:#2a1216;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--gold)}textarea{resize:vertical;min-height:84px}#app{max-width:1120px;margin:auto;padding:18px}.brand{font:36px Jua,sans-serif;margin:0}.sub{margin:4px 0 20px;color:#6c4d42}.panel{background:rgba(255,250,240,.94);border:1px solid #e6d6b6;border-radius:18px;padding:18px;box-shadow:0 8px 24px #57301812;margin-bottom:14px}.center{text-align:center}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.muted{color:#80695d;font-size:14px}.field{margin:12px 0}.field label{display:block;font-weight:bold;margin:0 0 6px}.colors{display:flex;gap:9px;flex-wrap:wrap}.swatch{width:36px;height:36px;border:3px solid #fff;border-radius:50%;padding:0;box-shadow:0 0 0 1px #9a826a}.swatch[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}.swatch[disabled]{opacity:0.3;cursor:not-allowed}.player{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:12px;background:#fffdf6;margin:7px 0}.dot{width:15px;height:15px;border-radius:50%;display:inline-block;flex:0 0 auto}.pill{border-radius:99px;padding:3px 10px;background:#f1e5ca;font-size:13px}.pill.ok{background:#dcefe1;color:#1c633d}.pill.king{background:#f5e2a7;color:#68490a}.gamegrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:14px}.stairs{display:flex;flex-direction:column;gap:7px}.step{min-height:50px;border-radius:10px;background:var(--red);color:#fff8e8;padding:8px 10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.step.final{background:#d6a43b;color:#301c0b;font-weight:bold}.step .num{opacity:.7;font-size:12px;min-width:20px}.avatar{display:inline-flex;align-items:center;gap:5px;border:1px solid #fff9;border-radius:99px;padding:3px 9px;background:#ffffff25;color:inherit;font-size:14px}.avatar i{width:10px;height:10px;border-radius:50%;display:inline-block}.question-card{border-left:4px solid #6c5ce7;padding:15px;margin:10px 0;background:#faf9ff;border-radius:12px}.rating-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rating-grid button{min-height:55px}.history{max-height:440px;overflow:auto}.history-item{background:#fffdf7;border-left:5px solid var(--green);border-radius:10px;padding:11px;margin:8px 0}.history-item b{display:block}.notice{padding:11px 13px;border-radius:12px;background:#f5e9cc;margin:10px 0}.error{color:#a31f35;font-weight:bold}.smallbtn{padding:8px 11px;font-size:14px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.roomcode{font:28px Jua,sans-serif;letter-spacing:3px;color:var(--red)}.hidden{display:none!important}.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#2a1216;color:#fff8e8;padding:10px 16px;border-radius:12px;z-index:9;max-width:90vw;box-shadow:0 6px 18px #0004}\n@media(max-width:760px){#app{padding:12px}.brand{font-size:31px}.gamegrid{grid-template-columns:1fr}.history{max-height:300px}.panel{padding:14px}.step{min-height:44px}.rating-grid{grid-template-columns:1fr}}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>프렌드프렌드</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#fbf3df;--bg2:#f1deb0;--ink:#2a1216;--red:#941f35;--gold:#d9a233;--card:#fffaf0;--green:#24784d;--line:#e7d5ae;box-sizing:border-box}
+        *{box-sizing:border-box}
+        body{margin:0;min-height:100vh;background:linear-gradient(145deg,var(--bg),var(--bg2));color:var(--ink);font:16px/1.5 'Gowun Dodum',sans-serif}
+        button,input,textarea,select{font:inherit}
+        button{border:0;border-radius:12px;padding:11px 16px;background:var(--red);color:#fff8e8;cursor:pointer;font-weight:700;box-shadow:0 3px 0 #5f1425;transition:transform 0.1s,opacity 0.1s}
+        button:active{transform:translateY(2px);box-shadow:0 1px 0 #5f1425}
+        button:disabled{opacity: 0.4;cursor:not-allowed;transform:none}
+        input,textarea,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;background:#fffdf7;color:#2a1216;outline:none}
+        input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+        textarea{resize:vertical;min-height:84px}
+        #app{max-width:1120px;margin:auto;padding:18px}
+        .brand{font:36px Jua,sans-serif;margin:0}
+        .sub{margin:4px 0 20px;color:#6c4242}
+        .panel{background:rgba(255,250,240, 0.94);border:1px solid #e6d6b6;border-radius:18px;padding:18px;box-shadow:0 8px 24px #57301812;margin-bottom:14px}
+        .center{text-align:center}
+        .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+        .row > *{flex:1}
+        .muted{color:#80695d;font-size:14px}
+        .field{margin:12px 0}
+        .field label{display:block;font-weight:bold;margin:0 0 6px}
+        .colors{display:flex;gap:9px;flex-wrap:wrap}
+        .swatch{width:36px;height:36px;border:3px solid #fff;border-radius:50%;padding:0;box-shadow:0 0 0 1px #9a826a;cursor:pointer}
+        .swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+        .swatch[disabled]{opacity:0.3;cursor:not-allowed}
+        .player{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:12px;background:#fffdf6;margin:7px 0}
+        .dot{width:15px;height:15px;border-radius:50%;display:inline-block;flex:0 0 auto}
+        .pill{border-radius:99px;padding:3px 10px;background:#f1e5ca;font-size:13px}
+        .pill.ok{background:#dcefe1;color:#1c633d}
+        .pill.king{background:#f5e2a7;color:#68490a}
+        .gamegrid{display:grid;grid-template-columns:minmax(0, 1fr) minmax(300px, 9fr);gap:14px}
+        .stairs{display:flex;flex-direction:column;gap:7px}
+        .step{min-height:50px;border-radius:10px;background:var(--red);color:#fff8e8;padding:8px 10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+        .step.final{background:#d6a43b;color:#301c0b;font-weight:bold}
+        .step .num{opacity: 0.7;font-size:12px;min-width:20px}
+        .avatar{display:inline-flex;align-items:center;gap:5px;border:1px solid #fff9;border-radius:99px;padding:3px 9px;background:#ffffff25;color:inherit;font-size:14px}
+        .avatar i{width:10px;height:10px;border-radius:50%;display:inline-block}
+        .question-card{border-left:4px solid #6c5ce7;padding:15px;margin:10px 0;background:#faf9ff;border-radius:12px}
+        .rating-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+        .rating-grid button{min-height:55px}
+        .history{max-height:440px;overflow:auto}
+        .history-item{background:#fffdf7;border-left:5px solid var(--green);border-radius:10px;padding:11px;margin:8px 0}
+        .history-item b{display:block}
+        .notice{padding:11px 13px;border-radius:12px;background:#f5e9cc;margin:10px 0}
+        .error{color:#a31f35;font-weight:bold}
+        .smallbtn{padding:8px 11px;font-size:14px}
+        .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+        .roomcode{font:28px Jua,sans-serif;letter-spacing:3px;color:var(--red)}
+        .hidden{display:none!important}
+        .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#2a1216;color:#fff8e8;padding:10px 16px;border-radius:12px;z-index:9;max-width:90vw;box-shadow:0 6px 18px #0004}
+        @media(max-width:760px){#app{padding:12px}.brand{font-size:31px}.gamegrid{grid-template-columns:1fr}.history{max-height:300px}.panel{padding:14px}.step{min-height:44px}.rating-grid{grid-template-columns:1fr}}
+    </style>
 </head>
 <body>
-<main id="app"></main>
+    <main id="app"></main>
 
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-<script src="./firebase-config.js"></script>
-<script>
-(() => {
-  'use strict';
-  const $ = s => document.querySelector(s);
-  const app = $('#app');
-  const COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899'];
-  const RATINGS = ['매우 싫음','싫음','좋음','매우 좋음'];
-  const DELTA = [-1, 0, 1, 2];
-  const MAX_PLAYERS = 8;
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="/firebase-config.js"></script>
 
-  let auth, db, uid = null, roomCode = null, roomRef = null, cb = null, state = null;
-  let nickname = '', color = 0, notice = '', screen = 'home', mode = 'create', joinCode = '', rivals = [];
-  let busy = false, leaving = false, nt = null;
+    <script>
+    (() => {
+        'use strict';
+        const $ = s => document.querySelector(s);
+        const app = $('#app');
+        const COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899'];
+        const RATINGS = ['매우 싫음','싫음','좋음','매우 좋음'];
+        const DELTA = [-1, 0, 1, 2];
+        const MAX_PLAYERS = 8;
 
-  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        let auth, db, uid = null, roomCode = null, roomRef = null, cb = null, state = null;
+        let nickname = '', color = 0, notice = '', screen = 'home', mode = 'create', joinCode = '', rivals = [];
+        let nt = null;
 
-  function flash(t) {
-    notice = t; render();
-    clearTimeout(nt); nt = setTimeout(() => { notice = ''; render(); }, 3500);
-  }
+        const QLIST = ["가장 좋아하는 음식은?", "가장 좋아하는 색은?", "가장 가고 싶은 여행지는?", "가장 하고 싶은 일은?", "가장 좋아하는 노래는?", "가장 좋아하는 계절은?", "가장 좋아하는 동물은?", "가장 좋아하는 영화는?"];
 
-  function render() {
-    if (!uid) {
-      app.innerHTML = `<section class="panel center"><h1 class="brand">👑 프렌드프렌드</h1><p>서버 연결 중...</p></section>`;
-      return;
-    }
-    if (screen === 'home') app.innerHTML = homeView();
-    else if (screen === 'code') app.innerHTML = codeView();
-    else if (screen === 'profile') app.innerHTML = profileView();
-    else if (screen === 'room') app.innerHTML = roomView();
-    
-    if (notice && screen !== 'room') {
-      const t = document.createElement('div'); t.className='toast'; t.textContent=notice;
-      app.appendChild(t); setTimeout(() => t.remove(), 3000);
-    }
-  }
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  // --- VIEWS ---
-  function header() { return `<div class="topbar"><h1 class="brand">👑 프렌드프렌드</h1><span class="pill">실시간 온라인 · v3</span></div>`; }
-  function footer() { return `<p class="muted">최대 ${MAX_PLAYERS}명 · 로그인 없이 참여</p>`; }
-
-  function homeView() {
-    return `${header()}<section class="panel center"><p class="sub">왕의 마음을 읽고, 평가를 받아 꼭대기까지 올라가세요!</p>
-    <div class="row"><button style="width:100%" onclick="window.goCreate()">방 만들기</button></div>
-    <div class="row" style="margin-top:10px"><button class="smallbtn" style="width:100%; background:#eee; color:#333; box-shadow:none" onclick="window.goJoin()">방 참여하기</button></div>
-    ${notice ? `<p class="error">${esc(notice)}</p>` : ''} ${footer()}</section>`;
-  }
-
-  function codeView() {
-    return `${header()}<section class="panel"><p class="sub">참여할 방 코드를 입력하세요.</p>
-    <div class="field"><label>방 코드 (4자리)</label><input id="joincode" maxlength="4" placeholder="예: ABCD" style="text-transform:uppercase"></div>
-    ${notice ? `<p class="error">${esc(notice)}</p>` : ''}
-    <div class="row"><button onclick="window.gotoHome()">뒤로</button><button onclick="window.goCode()">다음</button></div></section>`;
-  }
-
-  function profileView() {
-    const taken = rivals.map(p => p.color);
-    const title = mode === 'create' ? '방 만들기' : `방 ${esc(joinCode)} 입장`;
-    return `${header()}<section class="panel"><p class="sub">${title}</p>
-    <div class="field"><label>닉네임 (최대 2글자)</label><input id="nickname" maxlength="2" placeholder="예: 왕"></div>
-    <div class="field"><label>아바타 색상</label><div class="colors">${COLORS.map((c, i) => 
-      `<button class="swatch" style="background:${c}" ${taken.includes(i)?'disabled title="이미 사용 중"':''} onclick="window.setColor(${i})" aria-pressed="${color===i}"></button>`
-    ).join('')}</div></div>
-    ${notice ? `<p class="error">${esc(notice)}</p>` : ''}
-    <div class="row"><button onclick="window.gotoHome()">뒤로</button><button onclick="window.confirmProfile()">${mode==='create'?'방 만들기':'입장하기'}</button></div></section>`;
-  }
-
-  function roomView() {
-    const isKing = state.kingUid === uid;
-    const players = state.players || {};
-    const playerList = Object.entries(players).map(([id, p]) => 
-      `<span class="avatar"><i style="background:${p.color}"></i>${id===state.kingUid?'👑 ':''}${esc(p.name)}</span>`
-    ).join('');
-
-    let content = '';
-    if (state.phase === 'end') {
-      const history = state.history || [];
-      const favs = history.filter(h => h.rating >= 2).sort((a,b) => b.rating - a.rating || b.createdAt - a.createdAt).slice(0, 4);
-      content = `
-        <div class="panel center">
-          <h3 style="font-size:24px; Jua">👑 ${esc(state.players[state.winnerUid]?.name || '플레이어')} 승리!</h3>
-          <p>다음 판의 왕이 됩니다.</p>
-          <button onclick="window.restartGame()">다시하기</button> <button onclick="window.leaveRoom()">나가기</button>
-        </div>
-        <div class="panel">
-          <h3>📜 판 결과 요약</h3>
-          <div class="history">${Object.entries(players).map(([id, p]) => `<div class="player">${playerChip(p)} <span class="pill">${id===state.winnerUid?'🏆':'${p.name}'}</span></div>`).join('')}</div>
-        </div>
-        <div class="panel">
-          <h3>👑 왕이 가장 좋아했던 질문</h3>
-          ${favs.length ? favs.map(h => `<div class="question-card"><b>${esc(h.question)}</b><p class="muted">답변: ${esc(h.playerAnswer)}</p></div>`).join('') : '<p>없음</p>'}
-        </div>`;
-    } else if (isKing) {
-      const queue = state.queue || [];
-      const nextReady = queue.find(q => q.answer);
-      
-      if (!nextReady) {
-        content = `<div class="notice">새 답변을 기다리는 중입니다...</div>`;
-      } else {
-        content = `
-          <div class="question-card">
-            <span class="pill">평가 차례</span>
-            <h3 style="margin-top:10px">${esc(nextReady.question)}</h3>
-            <p><b class="ans">신하의 답변:</b><br>${esc(nextReady.answer)}</p>
-            <div class="rating-grid">
-              ${RATINGS.map((r, i) => `<button onclick="window.rateAnswer(${i}, '${nextReady.id}')">${r}</button>`).join('')}
-            </div>
-          </div>`;
-      }
-      content += `<button class="smallbtn" onclick="window.endGame()" style="margin-top:20px; opacity:0.6">게임 종료</button>`;
-    } else {
-      const myQ = (state.queue || []).find(q => q.askerUid === uid);
-      if (myQ && !myQ.answer) {
-        content = `
-          <div class="question-card">
-            <h3 style="margin-top:0">${esc(myQ.question)}</h3>
-            <textarea id="qanswer" placeholder="답변을 입력하세요..."></textarea>
-            <button onclick="window.sendAnswer()" style="width:100%; margin-top:10px">답변 보내기</button>
-          </div>`;
-      } else {
-        content = `<div class="notice">왕에게 질문을 보내고 답변을 기다려 주세요.</div>`;
-      }
-    }
-
-    return `
-      <div class="topbar"><div class="roomcode">${esc(roomCode)}</div><button onclick="window.leaveRoom()">나가기</button></div>
-      <div class="panel">${playerList}</div>
-      <div id="game-container">${content}</div>
-    `;
-  }
-
-  function playerChip(p) { return `<span class="avatar"><i style="background:${p.color}"></i>${esc(p.name)}</span>`; }
-
-  // --- LOGIC ---
-  window.goCreate = () => { screen='profile'; mode='create'; rivals=[]; nickname=''; color=0; render(); };
-  window.goJoin = () => { screen='code'; joinCode=''; rivals=[]; render(); };
-  window.gotoHome = () => { screen='home'; render(); };
-  window.goCode = async () => {
-    const c = $('#joincode').value.trim().toUpperCase();
-    if (!c) return flash('코드를 입력하세요.');
-    const s = await db.ref('rooms/'+c).once('value');
-    if (!s.exists()) return flash('방이 없습니다.');
-    joinCode = c;
-    rivals = Object.values(s.val().players || {});
-    screen = 'profile'; mode = 'join'; render();
-  };
-
-  window.setColor = (i) => { color = i; render(); };
-  window.confirmProfile = async () => {
-    const n = $('#nickname').value.trim();
-    if (n.length === 0 || n.length > 2) return flash('닉네임은 1~2자여야 합니다.');
-    if (mode === 'join' && rivals.some(p => p.name === n)) return flash('이미 있는 닉네임입니다.');
-    if (mode === 'join' && rivals.some(p => p.color === color)) return flash('이미 사용 중인 색상입니다.');
-    
-    nickname = n;
-    if (mode === 'create') {
-      const c = Math.random().toString(36).substring(2, 8).toUpperCase();
-      await db.ref('rooms/'+c).set({
-        kingUid: uid, status: 'playing', createdAt: Date.now(), lastActive: Date.now(),
-        players: { [uid]: { name: nickname, color, position: 0 } },
-        queue: [], history: [], used: []
-      });
-      roomCode = c;
-    } else {
-      roomCode = joinCode;
-      await db.ref('rooms/'+roomCode+'/players/'+uid).set({ name: nickname, color, position: 0 });
-    }
-    enterRoom(roomCode);
-  };
-
-  async function enterRoom(c) {
-    roomCode = c;
-    screen = 'room';
-    roomRef = db.ref('rooms/'+c);
-    roomRef.on('value', s => {
-      state = s.val();
-      if (state) {
-        render();
-        if (state.status === 'playing' && state.kingUid) {
-          if (!state.players[uid].pq) {
-            const q = QLIST[Math.floor(Math.random()*QLIST.length)];
-            roomRef.child('players/'+uid).update({ pq: q });
-          }
+        function flash(t) {
+            notice = t;
+            render();
+            clearTimeout(nt);
+            nt = setTimeout(() => { notice = ''; render(); }, 3500);
         }
-      } else {
-        alert('방이 사라졌습니다.');
-        window.location.reload();
-      }
-    });
-    render();
-  }
 
-  window.sendAnswer = async () => {
-    const text = $('#qanswer').value.trim();
-    if (!text) return;
-    const p = state.players[uid];
-    await roomRef.child('queue').push({
-      id: Date.now().toString(),
-      askerUid: uid,
-      askerName: p.name,
-      question: p.pq,
-      answer: text,
-      ts: Date.now()
-    });
-    await roomRef.child('players/'+uid).update({ pq: QLIST[Math.floor(Math.random()*QLIST.length)] });
-    await roomRef.update({ lastActive: Date.now() });
-    render();
-  };
+        function render() {
+            if (!uid) {
+                app.innerHTML = `<section class="panel center"><h1 class="brand">👑 프렌드프렌드</h1><p>서버 연결 중...</p></section>`;
+                return;
+            }
+            if (screen === 'home') app.innerHTML = homeView();
+            else if (screen === 'code') app.innerHTML = codeView();
+            else if (screen === 'profile') app.innerHTML = profileView();
+            else if (screen === 'room') app.innerHTML = roomView();
 
-  window.rateAnswer = async (val, qid) => {
-    const P = state.players;
-    const target = state.queue.find(q => q.id === qid);
-    if (!target) return;
-    const p = P[target.askerUid];
-    const top = Math.max(...Object.values(P).map(x=>x.position));
-    
-    const move = DELTA[val];
-    const newPos = Math.min(top, Math.max(0, p.position + move));
-    
-    await roomRef.child('players/'+target.askerUid).update({ position: newPos });
-    await roomRef.child('history').push({
-      question: target.question,
-      playerAnswer: target.answer,
-      rating: val,
-      by: target.askerUid,
-      createdAt: Date.now()
-    });
-    await roomRef.child('queue').child(qid).remove();
-    await roomRef.update({ lastActive: Date.now() });
-  };
+            if (notice && screen !== 'room') {
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.textContent = notice;
+                app.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            }
+        }
 
-  window.startGame = async () => {
-    await roomRef.update({ status: 'playing', lastActive: Date.now() });
-  };
+        // --- VIEWS ---
+        function header() { return `<div class="topbar"><h1 class="brand">👑 프렌드프렌드</h1><span class="pill">실시간 온라인 · v3</span></div>`; }
+        function footer() { return `<p class="muted">최대 ${MAX_PLAYERS}명 · 로그인 없이 참여</p>`; }
 
-  window.endGame = async () => {
-    const winners = Object.entries(state.players).sort((a,b)=>b[1].position - a[1].position);
-    const winnerUid = winners[0][0];
-    await roomRef.update({ status: 'end', winnerUid: winnerUid, lastActive: Date.now() });
-  };
+        function homeView() {
+            return `${header()}<section class="panel center"><p class="sub">왕의 마음을 읽고, 평가를 받아 꼭대기까지 올라가세요!</p>
+                <div class="row"><button style="width:100%" onclick="window.goCreate()">방 만들기</button></div>
+                <div class="row" style="margin-top:10px"><button class="smallbtn" style="width:100%; background:#eee; color:#333; box-shadow:none" onclick="window.goJoin()">방 참여하기</button></div>
+                ${notice ? `<p class="error">${esc(notice)}</p>` : ''} ${footer()}</section>`;
+        }
 
-  window.restartGame = async () => {
-    await roomRef.update({ status: 'playing', queue: [], history: [], lastActive: Date.now() });
-  };
+        function codeView() {
+            return `${header()}<section class="panel"><p class="sub">참여할 방 코드를 입력하세요</p>
+                <div class="field"><label>방 코드 (4자리)</label><input id="joincode" maxlength="4" placeholder="예: ABCD" style="text-transform:uppercase"></div>
+                ${notice ? `<p class="error">${esc(notice)}</p>` : ''}
+                <div class="row"><button onclick="window.gotoHome()">뒤로</button><button onclick="window.goCode()">다음</button></div></section>`;
+        }
 
-  window.leaveRoom = async () => {
-    if (roomRef) {
-      await roomRef.child('players/'+uid).remove();
-      roomRef.off();
-    }
-    location.reload();
-  };
+        function profileView() {
+            const taken = rivals.map(p => p.color);
+            const title = mode === 'create' ? '방 만들기' : `방 ${esc(joinCode)} 입장`;
+            return `${header()}<section class="panel"><p class="sub">${title}</p>
+                <div class="field"><label>닉네임 (최대 2글자)</label><input id="nickname" maxlength="2" placeholder="예: 왕"></div>
+                <div class="field"><label>아바타 색상</label><div class="colors">${COLORS.map((c, i) => 
+                    `<button class="swatch" style="background:${c}" ${taken.includes(i)?'disabled title="이미 사용 중"' : ''} onclick="window.setColor(${i})" aria-pressed="${color===i}"></button>`
+                ).join('')}</div></div>
+                ${notice ? `<p class="error">${esc(notice)}</p>` : ''}
+                <div class="row"><button onclick="window.gotoHome()">뒤로</button><button onclick="window.confirmProfile()">${mode==='create'?'방 만들기':'입장하기'}</button></div></section>`;
+        }
 
-  const QLIST = ["가장 좋아하는 음식은?", "가장 좋아하는 색은?", "가장 가고 싶은 여행지는?", "가장 하고 싶은 일은?", "가장 좋아하는 노래는?", "가장 좋아하는 계절은?", "가장 좋아하는 동물은?", "가장 좋아하는 영화는?", "가장 좋아하는 계절은?", "가장 좋아하는 계절은?", "가장 좋아하는 계절은?", "가장 좋아하는 계절은?", "가장 좋아하는 계절은?"];
+        function roomView() {
+            const isKing = state.kingUid === uid;
+            const players = state.players || {};
+            const playerList = Object.entries(players).map(([id, p]) => 
+                `<span class="avatar"><i style="background:${p.color}"></i>${id === state.kingUid ? '👑 ' : ''}${esc(p.name)}</span>`
+            ).join('');
 
-  async function init() {
-    try {
-      const CFG = window.FRIENDFRIEND_FIREBASE_CONFIG;
-      if (!CFG) throw new Error("Firebase Config Missing");
-      firebase.initializeApp(CFG);
-      auth = firebase.auth();
-      db = firebase.database();
-      const cred = await auth.signInAnonymously();
-      uid = cred.user.uid;
-      render();
-    } catch (e) {
-      app.innerHTML = `<div class="panel center"><p class="error">${esc(e.message)}</p></div>`;
-    }
-  }
+            let content = '';
+            if (state.phase === 'end') {
+                const history = state.history || [];
+                const favs = history.filter(h => h.rating >= 2).sort((a,b) => b.rating - a.rating || b.createdAt - a.createdAt).slice(0, 4);
+                const winnerName = state.players[state.winnerUid] ? state.players[state.winnerUid].name : '플레이어';
 
-  init();
-})();
-</script>
+                content = `
+                    <div class="panel center">
+                        <h3 style="font-size:24px">👑 ${esc(winnerName)} 승리!</h3>
+                        <p>다음 판의 왕이 됩니다</p>
+                        <button onclick="window.restartGame()">다시하기</button> <button onclick="window.leaveRoom()">나가기</button>
+                    </div>
+                    <div class="panel">
+                        <h3>📜 판 결과 요약</h3>
+                        <div class="history">${Object.entries(players).map(([id, p]) => `<div class="player">${playerChip(p)} <span class="pill">${id === state.winnerUid ? '🏆' : p.name}</span></div>`).join('')}</div>
+                    </div>
+                    <div class="panel">
+                        <h3>👑 왕이 가장 좋아했던 질문</h3>
+                        ${favs.length ? favs.map(h => `<div class="question-card"><b>${esc(h.question)}</b><p class="muted">답변: ${esc(h.playerAnswer)}</p></div>`).join('') : '<p>없음</p>'}
+                    </div>`;
+            } else if (isKing) {
+                const queue = state.queue || [];
+                const nextReady = queue.find(q => q.answer);
+
+                if (!nextReady) {
+                    content = `<div class="notice">새 답변을 기다리는 중입니다...</div>`;
+                } else {
+                    content = `
+                        <div class="question-card">
+                            <span class="pill">평가 차례</span>
+                            <h3 style="margin-top:10px">${esc(nextReady.question)}</h3>
+                            <p><b class="ans">신하의 답변:</b><br>${esc(nextReady.answer)}</p>
+                            <div class="rating-grid">
+                                ${RATINGS.map((r, i) => `<button onclick="window.rateAnswer(${i}, '${nextReady.id}')">${r}</button>`).join('')}
+                            </div>
+                        </div>`;
+                }
+                content += `<button class="smallbtn" onclick="window.endGame()" style="margin-top:20px; opacity:0.6">게임 종료</button>`;
+            } else {
+                const myQ = (state.queue || []).find(q => q.askerUid === uid);
+                if (myQ && !myQ.answer) {
+                    content = `
+                        <div class="question-card">
+                            <h3 style="margin-top:0">${esc(myQ.question)}</h3>
+                            <textarea id="qanswer" placeholder="답변을 입력하세요..."></textarea>
+                            <button onclick="window.sendAnswer()" style="width:100%; margin-top:10px">답변 보내기</button>
+                        </div>`;
+                } else {
+                    content = `<div class="notice">왕에게 질문을 보내고 답변을 기다려 주세요</div>`;
+                }
+            }
+
+            return `
+                <div class="topbar"><div class="roomcode">${esc(roomCode)}</div><button onclick="window.leaveRoom()">나가기</button></div>
+                <div class="panel">${playerList}</div>
+                <div id="game-container">${content}</div>`;
+        }
+
+        function playerChip(p) { return `<span class="avatar"><i style="background:${p.color}"></i>${esc(p.name)}</span>`; }
+
+        // --- LOGIC ---
+        window.goCreate = () => { screen='profile'; mode='create'; rivals=[]; nickname=''; color=0; render(); };
+        window.goJoin = () => { screen='code'; joinCode=''; rivals=[]; render(); };
+        window.gotoHome = () => { screen='home'; render(); };
+        window.goCode = async () => {
+            const c = $('#joincode').value.trim().toUpperCase();
+            if (!c) return flash('코드를 입력하세요');
+            const s = await roomRef ? null : db.ref('rooms/' + c).once('value');
+            if (!s || !s.exists()) return flash('방이 없습니다');
+            joinCode = c;
+            rivals = Object.values(s.val().players || {});
+            screen = 'profile'; mode = 'join'; render();
+        };
+
+        window.setColor = (i) => { color = i; render(); };
+
+        window.confirmProfile = async () => {
+            const n = $('#nickname').value.trim();
+            if (n.length === 0 || n.length > 2) return flash('닉네임은 1~2자여야 합니다');
+            if (mode === 'join' && rivals.some(p => p.name === n)) return flash('이미 있는 닉네임입니다');
+            if (mode === 'join' && rivals.some(p => p.color === color)) return flash('이미 사용 중인 색상입니다');
+
+            nickname = n;
+            if (mode === 'create') {
+                const c = Math.random().toString(36).substring(2, 8).toUpperCase();
+                await db.ref('rooms/' + c).set({
+                    kingUid: uid, status: 'playing', createdAt: Date.now(), lastActive: Date.now(),
+                    players: { [uid]: { name: nickname, color, position: 0 } },
+                    queue: [], history: [], used: []
+                });
+                roomCode = c;
+            } else {
+                roomCode = joinCode;
+                await db.ref(`rooms/${roomCode}/players/${uid}`).set({ name: nickname, color, position: 0 });
+            }
+            enterRoom(roomCode);
+        };
+
+        async function enterRoom(c) {
+            roomCode = c;
+            screen = 'room';
+            roomRef = db.ref('rooms/' + c);
+            roomRef.on('value', s => {
+                state = s.val();
+                if (state) {
+                    render();
+                    // 참여자가 처음 들어왔을 때 질문 할당
+                    if (state.status === 'playing' && state.players[uid] && !state.players[uid].pq) {
+                        const q = QLIST[Math.floor(Math.random() * QLIST.length)];
+                        roomRef.child('players/' + uid).update({ pq: q });
+                    }
+                } else {
+                    alert('방이 사라졌습니다');
+                    location.reload();
+                }
+            });
+            render();
+        }
+
+        window.sendAnswer = async () => {
+            const text = $('#qanswer').value.trim();
+            if (!text) return;
+            const p = state.players[uid];
+            const newQuestion = p.pq;
+
+            await roomRef.child('queue').push({
+                id: Date.now().toString(),
+                askerUid: uid,
+                askerName: p.name,
+                question: newQuestion,
+                answer: text,
+                ts: Date.now()
+            });
+
+            // 다음 질문 미리 할당
+            const nextQ = QLIST[Math.floor(Math.random() * QLIST.length)];
+            await roomRef.child('players/' + uid).update({ pq: nextQ });
+            await roomRef.update({ lastActive: Date.now() });
+            render();
+        };
+
+        window.rateAnswer = async (val, qid) => {
+            const P = state.players;
+            const target = state.queue.find(q => q.id === qid);
+            if (!target) return;
+
+            const p = P[target.askerUid];
+            const top = Math.max(...Object.values(P).map(x => x.position));
+            const move = DELTA[val];
+            const newPos = Math.min(top, Math.max(0, p.position + move));
+
+            await roomRef.child('players/' + target.askerUid).update({ position: newPos });
+            await roomRef.child('history').push({
+                question: target.question,
+                playerAnswer: target.answer,
+                rating: val,
+                by: target.askerUid,
+                createdAt: Date.now()
+            });
+            await roomRef.child('queue').child(qid).remove();
+            await roomRef.update({ lastActive: Date.now() });
+            render();
+        };
+
+        window.endGame = async () => {
+            const entries = Object.entries(state.players).sort((a, b) => b[1].position - a[1].position);
+            const winnerUid = entries[0][0];
+            await roomRef.update({ status: 'end', winnerUid: winnerUid, lastActive: Date.now() });
+        };
+
+        window.restartGame = async () => {
+            await roomRef.update({ status: 'playing', queue: [], history: [], lastActive: Date.now() });
+        };
+
+        window.leaveRoom = async () => {
+            if (roomRef) {
+                await roomRef.child('players/' + uid).remove();
+                roomRef.off();
+            }
+            location.reload();
+        };
+
+        async function init() {
+            try {
+                const CFG = window.FRIENDFRIEND_FIREBASE_CONFIG;
+                if (!CFG) throw new Error("Firebase 설정이 없습니다. firebase-config.js를 확인하세요.");
+                firebase.initializeApp(CFG);
+                auth = firebase.auth();
+                db = firebase.database();
+                const cred = await auth.signInAnonymously();
+                uid = cred.user.uid;
+                render();
+            } catch (e) {
+                app.innerHTML = `<div class="panel center"><p class="error">${esc(e.message)}</p></div>`;
+            }
+        }
+
+        init();
+    })();
+    </script>
 </body>
 </html>
