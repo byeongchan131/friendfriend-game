@@ -42,7 +42,7 @@ function safeText(v,max=90){return String(v||'').trim().slice(0,max)}
 const kname=()=>state?.players?.[state.kingUid]?.name||'왕';
 function promptHtml(){return Object.entries(QCATS).map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(q=>`<option>${esc(q.replace(/\{k\}/g,kname()))}</option>`).join('')}</optgroup>`).join('')}
 function playerChip(p){return `<span class="avatar"><i style="background:${COLORS[p.color]||COLORS[0]}"></i>${esc(p.name)}</span>`}
-const VERSION='v2.2';
+const VERSION='v2.3';
 const CATS=[
  {k:['음식','먹','메뉴','간식','디저트','과일','빵','해장','야식','요리','과자','국물','아침','점심','저녁'],good:['치킨','떡볶이','삼겹살','김치찌개','라면','초밥','피자','국밥','짜장면','불고기','파스타','마라탕','족발','돈까스','곱창'],bad:['아파트','자동차','에어컨','우산','의자']},
  {k:['색'],good:['파란색','빨간색','초록색','검은색','흰색','분홍색','보라색','노란색','회색','하늘색'],bad:['월요일','자동차 엔진']},
@@ -68,7 +68,7 @@ const SLANG_POS=['존나','개','ㅈㄴ','완전'];const SLANG_NEG=['ㅅㅂ','�
 function casual(a,neg){const r=Math.random();let x=a;if(r<0.25)x=pick(neg?SLANG_NEG:SLANG_POS)+' '+x;else if(r<0.3&&neg)x=pick(SLANG_NEG)+' '+x;return x+pick(PUNCT)}
 function judge(q,a){const t=String(a),c=catOf(q);if(SILLY.includes(t)||c.bad.some(b=>t.includes(b)))return 'weird';if(!c.good.includes(t)&&ALL_GOOD.includes(t))return 'weird';return 'ok'}
 function botRate(q,a,mood){const w=judge(q,a)==='weird';if(mood==='picky')return w?pick([0,0,1]):pick([0,1,1,2,3]);if(mood==='nice')return w?pick([0,1,1]):pick([1,2,3,3]);return w?pick([0,0,1]):pick([0,1,2,2,3])}
-function botAnswer(q){const c=catOf(q);const r=Math.random();if(r<0.1)return casual(pick(ALL_GOOD.filter(x=>!c.good.includes(x))),false);if(r<0.14)return casual(pick(SILLY),true);if(r<0.2)return casual(pick(c.bad),true);return casual(pick(c.good),false)}
+function botAnswer(q){const c=catOf(q);const r=Math.random();if(r<0.05)return casual(pick(ALL_GOOD.filter(x=>!c.good.includes(x))),false);if(r<0.07)return casual(pick(SILLY),true);if(r<0.1)return casual(pick(c.bad),true);return casual(pick(c.good),false)}
 let botBusy={};
 function botTick(){
  if(!state||!roomRef||uid!==state.hostUid||state.phase!=='play')return;
@@ -106,7 +106,7 @@ if(state.phase==='end'){const best=(state.history||[]).filter(h=>h.rating>=2).so
 if(isKing()){
   if(!first)return `<div class="notice">새 질문을 기다리는 중입니다. 다른 참가자가 답변을 보내면 여기에 표시됩니다.</div>`;
   const gone=!state.players[first.askerUid];
-  if(gone||!first.answer)return `<div class="question-card"><span class="pill">${gone?'참가자가 나갔어요':'답변 기다리는 중'}</span><h3>${esc(first.question)}</h3>${gone?'<button onclick="window.skipQuestion()">다음 질문으로</button>':'<p class="muted">참가자가 답변을 보내면 바로 평가할 수 있어요.</p>'}</div>`;
+  if(gone||!first.answer)return `<div class="question-card"><span class="pill">${gone?'참가자가 나갔어요':'답변 기다리는 중'}</span>${gone?'<h3>'+esc(first.question)+'</h3><button onclick="window.skipQuestion()">다음 질문으로</button>':'<p class="muted">답변 기다리는 중...</p>'}</div>`;
   return `<div class="question-card"><span class="pill">평가 차례</span><h3>${esc(first.question)}</h3><p><b>참가자의 답변</b><br>${esc(first.answer)}</p><h3>어떻게 평가할까요?</h3><div class="rating-grid">${RATINGS.map((v,i)=>`<button onclick="window.rateAnswer(${i})">${v}<br><small>${i===0?'1칸 아래 · 새 질문':i===1?'그대로 · 같은 질문':i===2?'1칸 위 · 새 질문':'2칸 위 · 새 질문'}</small></button>`).join('')}</div></div>`;
  }
  if(mine&&!mine.answer)return `<div class="question-card"><span class="pill">${mine.re?'재질문':'랜덤 질문'}</span><h3>${esc(mine.question)}</h3><textarea id="qanswer" maxlength="180" placeholder="답변을 입력하세요"></textarea><button style="margin-top:8px" onclick="window.submitAnswer()">답변 보내기</button> ${swapBtn()}<p class="muted">${posInfo()}</p></div>`;
