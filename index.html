@@ -42,7 +42,7 @@ function safeText(v,max=90){return String(v||'').trim().slice(0,max)}
 const kname=()=>state?.players?.[state.kingUid]?.name||'왕';
 function promptHtml(){return Object.entries(QCATS).map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(q=>`<option>${esc(q.replace(/\{k\}/g,kname()))}</option>`).join('')}</optgroup>`).join('')}
 function playerChip(p){return `<span class="avatar"><i style="background:${COLORS[p.color]||COLORS[0]}"></i>${esc(p.name)}</span>`}
-const VERSION='v2.4';
+const VERSION='v2.5';
 const CATS=[
  {k:['음식','먹','메뉴','간식','디저트','과일','빵','해장','야식','요리','과자','국물','아침','점심','저녁'],good:['치킨','떡볶이','삼겹살','김치찌개','라면','초밥','피자','국밥','짜장면','불고기','파스타','마라탕','족발','돈까스','곱창'],bad:['아파트','자동차','에어컨','우산','의자']},
  {k:['색'],good:['파란색','빨간색','초록색','검은색','흰색','분홍색','보라색','노란색','회색','하늘색'],bad:['월요일','자동차 엔진']},
@@ -65,14 +65,24 @@ const SILLY=['그냥 숨쉬기ㅋㅋ','냉장고에 있는 거 다 ㅋㅋ','나 
 const ENDS=['ㅋㅋ','ㅋㅋㅋ','ㅎㅎ','ㄹㅇ','ㅇㅇ','ㅠㅠ','','',''];
 const MILD=['개','존','ㅈㄴ','완전','씨 진짜'];
 const SLANG_POS=['존나','개','ㅈㄴ','완전'];const SLANG_NEG=['ㅅㅂ','ㅈㄹ','아 ㅅㅂ','개'];const PUNCT=['!','!!','?','~','...','ㅋㅋ','ㅋㅋㅋ!','?!','.',''];
-function casual(a,neg){const r=Math.random();let x=a;if(r<0.25)x=pick(neg?SLANG_NEG:SLANG_POS)+' '+x;else if(r<0.3&&neg)x=pick(SLANG_NEG)+' '+x;return x+pick(PUNCT)}
+function casual(a,neg){const r=Math.random();let x=a;if(r<0.06)x=pick(neg?SLANG_NEG:SLANG_POS)+' '+x;else if(r<0.1&&neg)x=pick(SLANG_NEG)+' '+x;return x+pick(PUNCT)}
 function judge(q,a){const t=String(a),c=catOf(q);if(SILLY.includes(t)||c.bad.some(b=>t.includes(b)))return 'weird';if(!c.good.includes(t)&&ALL_GOOD.includes(t))return 'weird';return 'ok'}
 function botRate(q,a,mood){const w=judge(q,a)==='weird';if(mood==='picky')return w?pick([0,0,1]):pick([0,1,1,2,3]);if(mood==='nice')return w?pick([0,1,1]):pick([1,2,3,3]);return w?pick([0,0,1]):pick([0,1,2,2,3])}
 const EXTRA={'음식':['비빔밥','냉면','샤브샤브','김밥','쌀국수','회','연어 초밥','닭갈비','찜닭','치즈돈까스','우동','감자탕','쭈꾸미','베이글','샌드위치','리조또'],'색':['민트색','베이지색','카키색','와인색','네이비','연두색','살구색','은색','진한 빨강','연한 파랑'],'동물':['고슴도치','미어캣','코알라','알파카','수달','판다','사슴','거북이','오리','돌고래'],'계절':['초여름','늦가을','첫눈 오는 겨울','벚꽃 피는 봄','장마','단풍철','한겨울','초봄'],'노래':['잔잔한 발라드','신나는 댄스','옛날 가요','요즘 아이돌 노래','OST','R&B','록','클래식','감성 발라드'],'영화':['애니메이션','판타지 영화','스릴러','공포','가족 영화','드라마 영화','느와르','뮤지컬 영화'],'여행':['강원도','전주','경주','여수','싱가포르','홍콩','발리','스위스','하와이','뉴욕'],'혼자':['넷플릭스 보기','게임','산책','잠 자기','유튜브 보기','요리','청소','낮잠','배달 시켜 먹기','웹툰 보기','독서','음악 듣기','샤워하기','영상 편집','운동','빨래','방 정리','그냥 멍때리기','카페 가기','쇼핑하기'],'음료':['아이스 아메리카노','바닐라 라떼','자몽에이드','레몬차','홍차','밀크티','사이다','와인','위스키','보리차'],'스포츠':['농구 보기','야구 직관','축구 경기','테니스','골프','배드민턴','볼링','러닝'],'친구':['항상 밝은 사람','믿을 만한 사람','맛집 잘 아는 사람','유머 감각 좋은 사람','조용한 사람','의리 있는 사람'],'직업':['의사','변호사','유튜버','작가','파일럿','회계사','엔지니어','프리랜서','사장님']};
 const DEF_EXTRA=['집에서 쉬는 거','친구랑 수다 떠는 거','맛있는 거 먹기','그냥 잠','폰 보기','딱히 생각 안 해봄','그때그때 달라요','상황 봐서요','기분 따라 달라요','그냥 편하게 있는 거','잘 모르겠음','좋은 쪽으로요'];
 const YESNO=['네 맞아요','응 그런 편이에요','아니요 별로요','반반이요','가끔 그래요','거의 항상 그래요','아뇨 안 그래요','음... 애매해요','네 완전 그래요','그건 좀 아닌 듯요','때에 따라 달라요','맞음!','아님 ㅋㅋ'];
-const isYesNo=q=>/(나요|인가요|편인가요|있나요|할까요|까요|인지요|인가)\s*\?$/.test(String(q));
-function botAnswer(q){const c=catOf(q);const isDef=c===DEF_CAT;if(isYesNo(q))return casual(pick(YESNO),false);const key=c.k?c.k[0]:null;const more=(!isDef&&EXTRA[key])||DEF_EXTRA;return casual(pick(c.good.concat(more)),false)}
+const WH_BLOCK=/(어디|언제|누구|몇|어떻게|무엇|뭐|뭘|어느|왜|어떤)/;
+const isYesNo=q=>{const t=String(q);return /(편인가요|인가요|있나요|없나요|할까요|좋나요|싫나요|맞나요|편이에요|해요)\s*\?$/.test(t)&&!WH_BLOCK.test(t)};
+const WHA=[
+ {k:/어디/,a:['제주도','부산','일본 오사카','태국 방콕','유럽 여행','강릉','집 근처 카페','호주','베트남 다낭','그냥 집']},
+ {k:/언제/,a:['어릴 때','고등학생 때','대학 때','작년쯤','얼마 전','잘 기억 안 남','주말에','퇴근하고']},
+ {k:/누구/,a:['엄마','친구','아빠','선생님','연인','그냥 나','동생','룸메']},
+ {k:/몇 /,a:['세 번쯤','두 명','다섯 개쯤','여럿이요','기억 안 남','한 번이요']},
+ {k:/어떻게/,a:['그냥 막 해요','차근차근','친구 따라서','유튜브 보고','알아서요']},
+ {k:/(중|먼저).*(무엇|뭐|뭘)|(무엇|뭐|뭘).*(먼저|중)/,a:['밥','반찬','국물','고기','밥 한 숟갈','김치','그냥 다']},
+ {k:/(초능력|능력|마법|된다면|타임머신|환생|무인도|우주|복권|투명인간)/,a:['하늘 날기','시간 멈추기','투명인간','텔레파시','순간이동','모든 언어 이해','잠 실컷 자기','돈 엄청 쓰기','맛집 투어','고양이로 살기']}
+];
+function botAnswer(q){const t=String(q);if(isYesNo(t))return casual(pick(YESNO),false);const w=WHA.find(x=>x.k.test(t));if(w&&Math.random()<0.85)return casual(pick(w.a),false);const c=catOf(q);const isDef=c===DEF_CAT;const key=c.k?c.k[0]:null;const more=(!isDef&&EXTRA[key])||DEF_EXTRA;return casual(pick(c.good.concat(more)),false)}
 let botBusy={};
 function botTick(){
  if(!state||!roomRef||uid!==state.hostUid||state.phase!=='play')return;
