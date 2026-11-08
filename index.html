@@ -42,27 +42,33 @@ function safeText(v,max=90){return String(v||'').trim().slice(0,max)}
 const kname=()=>state?.players?.[state.kingUid]?.name||'왕';
 function promptHtml(){return Object.entries(QCATS).map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(q=>`<option>${esc(q.replace(/\{k\}/g,kname()))}</option>`).join('')}</optgroup>`).join('')}
 function playerChip(p){return `<span class="avatar"><i style="background:${COLORS[p.color]||COLORS[0]}"></i>${esc(p.name)}</span>`}
-const VERSION='v2.1';
+const VERSION='v2.2';
 const CATS=[
- {k:['음식','먹','메뉴','간식','디저트','과일','빵','해장','야식','요리','과자','국물','아침'],good:['치킨','떡볶이','삼겹살','김치찌개','라면','초밥','피자','국밥','짜장면','불고기'],bad:['아파트','자동차','에어컨','우산','의자','컴퓨터','냉장고']},
- {k:['색'],good:['파란색','빨간색','초록색','검은색','흰색','분홍색','보라색','노란색'],bad:['월요일','자동차 엔진','아파트']},
- {k:['동물','강아지','고양이'],good:['강아지','고양이','토끼','햄스터','펭귄','수달'],bad:['아파트','냉장고','라면','지하철']},
- {k:['계절'],good:['봄','여름','가을','겨울'],bad:['월요일','컴퓨터','라면']},
- {k:['노래','가수','음악','곡'],good:['발라드','댄스곡','트로트','힙합','재즈','팝송'],bad:['냉장고','아파트','김치찌개']},
- {k:['영화','드라마','예능'],good:['액션 영화','로맨스 영화','코미디','공포 영화','SF 영화'],bad:['아파트','라면','월요일']},
- {k:['여행','나라','도시','해외'],good:['제주도','부산','일본','태국','베트남','유럽'],bad:['냉장고','월요일','라면']},
- {k:['취미','운동','게임'],good:['산책','러닝','독서','게임','요리','영화 보기','노래방'],bad:['아파트','냉장고','삼겹살']}
+ {k:['음식','먹','메뉴','간식','디저트','과일','빵','해장','야식','요리','과자','국물','아침','점심','저녁'],good:['치킨','떡볶이','삼겹살','김치찌개','라면','초밥','피자','국밥','짜장면','불고기','파스타','마라탕','족발','돈까스','곱창'],bad:['아파트','자동차','에어컨','우산','의자']},
+ {k:['색'],good:['파란색','빨간색','초록색','검은색','흰색','분홍색','보라색','노란색','회색','하늘색'],bad:['월요일','자동차 엔진']},
+ {k:['동물','강아지','고양이','반려'],good:['강아지','고양이','토끼','햄스터','펭귄','수달','앵무새'],bad:['아파트','냉장고','라면']},
+ {k:['계절'],good:['봄','여름','가을','겨울','장마철'],bad:['월요일','컴퓨터']},
+ {k:['노래','가수','음악','곡'],good:['발라드','댄스곡','트로트','힙합','재즈','팝송','인디'],bad:['냉장고','아파트']},
+ {k:['영화','드라마','예능','작품'],good:['액션 영화','로맨스 영화','코미디','공포 영화','SF','다큐'],bad:['아파트','라면']},
+ {k:['여행','나라','도시','해외','가고 싶은'],good:['제주도','부산','일본','태국','베트남','유럽','강릉'],bad:['월요일']},
+ {k:['혼자','집에서','주말','하루','쉬는 날','취미','운동','게임'],good:['넷플릭스 보기','게임','산책','잠 자기','유튜브 보기','요리','청소','낮잠','배달 시켜 먹기','웹툰 보기','독서','운동'],bad:['아파트','삼겹살']},
+ {k:['음료','커피','마실','술'],good:['아메리카노','녹차','콜라','맥주','소주','탄산수','우유'],bad:['자동차','의자']},
+ {k:['스포츠','팀','야구','축구','농구'],good:['야구','축구','농구','배구','수영','탁구'],bad:['냉장고','라면']},
+ {k:['친구','사람','모임','연인','이상형','데이트'],good:['솔직한 사람','유머 있는 사람','잘 웃는 사람','배려 있는 사람','말 잘 통하는 사람'],bad:['아파트','자동차']},
+ {k:['직업','직장','학교','과목','업무','회사'],good:['개발자','디자이너','선생님','간호사','요리사','공무원','백수'],bad:['아파트','냉장고']}
 ];
-const DEF_CAT={good:['그때그때 달라요','잘 모르겠어요','집에서 쉬는 거요','친구랑 노는 거','딱히 없어요','음... 생각해 볼게요'],bad:['아파트','냉장고','의자']};
+const ALL_GOOD=[...new Set(CATS.flatMap(c=>c.good))];
+const DEF_CAT={good:['그때그때 달라요','잘 모르겠어요','집에서 쉬는 거요','친구랑 노는 거','딱히 없어요','음... 생각해 볼게요','그냥 편한 거','기분 따라 달라요'],bad:['아파트','의자']};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function catOf(q){return CATS.find(c=>c.k.some(w=>String(q).includes(w)))||DEF_CAT}
 const SILLY=['그냥 숨쉬기ㅋㅋ','냉장고에 있는 거 다 ㅋㅋ','나 자신 ㅇㅇ','그 주에 본 지렁이','월요일이요 ㅠㅠ','잘 모르겠음 ㅋㅋ 그냥 눈 감고 찍음','고양이 밥','엄마 잔소리 ㅋㅋ','개웃긴 거 ㅋㅋ','아 몰라 배고파'];
 const ENDS=['ㅋㅋ','ㅋㅋㅋ','ㅎㅎ','ㄹㅇ','ㅇㅇ','ㅠㅠ','','',''];
 const MILD=['개','존','ㅈㄴ','완전','씨 진짜'];
-function casual(a){const r=Math.random();if(r<0.25)return pick(MILD)+' '+a;if(r<0.55)return a+' '+pick(ENDS);return a}
-function judge(q,a){const t=String(a);return (SILLY.includes(t)||catOf(q).bad.some(b=>t.includes(b)))?'weird':'ok'}
+const SLANG_POS=['존나','개','ㅈㄴ','완전'];const SLANG_NEG=['ㅅㅂ','ㅈㄹ','아 ㅅㅂ','개'];const PUNCT=['!','!!','?','~','...','ㅋㅋ','ㅋㅋㅋ!','?!','.',''];
+function casual(a,neg){const r=Math.random();let x=a;if(r<0.25)x=pick(neg?SLANG_NEG:SLANG_POS)+' '+x;else if(r<0.3&&neg)x=pick(SLANG_NEG)+' '+x;return x+pick(PUNCT)}
+function judge(q,a){const t=String(a),c=catOf(q);if(SILLY.includes(t)||c.bad.some(b=>t.includes(b)))return 'weird';if(!c.good.includes(t)&&ALL_GOOD.includes(t))return 'weird';return 'ok'}
 function botRate(q,a,mood){const w=judge(q,a)==='weird';if(mood==='picky')return w?pick([0,0,1]):pick([0,1,1,2,3]);if(mood==='nice')return w?pick([0,1,1]):pick([1,2,3,3]);return w?pick([0,0,1]):pick([0,1,2,2,3])}
-function botAnswer(q){const c=catOf(q);const r=Math.random();if(r<0.12)return pick(SILLY);if(r<0.2)return pick(c.bad);return casual(pick(c.good))}
+function botAnswer(q){const c=catOf(q);const r=Math.random();if(r<0.1)return casual(pick(ALL_GOOD.filter(x=>!c.good.includes(x))),false);if(r<0.14)return casual(pick(SILLY),true);if(r<0.2)return casual(pick(c.bad),true);return casual(pick(c.good),false)}
 let botBusy={};
 function botTick(){
  if(!state||!roomRef||uid!==state.hostUid||state.phase!=='play')return;
@@ -101,7 +107,7 @@ if(isKing()){
   if(!first)return `<div class="notice">새 질문을 기다리는 중입니다. 다른 참가자가 답변을 보내면 여기에 표시됩니다.</div>`;
   const gone=!state.players[first.askerUid];
   if(gone||!first.answer)return `<div class="question-card"><span class="pill">${gone?'참가자가 나갔어요':'답변 기다리는 중'}</span><h3>${esc(first.question)}</h3>${gone?'<button onclick="window.skipQuestion()">다음 질문으로</button>':'<p class="muted">참가자가 답변을 보내면 바로 평가할 수 있어요.</p>'}</div>`;
-  return `<div class="question-card"><span class="pill">평가 차례</span><h3>${esc(first.question)}</h3><p><b>참가자의 답변</b><br>${esc(first.answer)}</p><h3>어떻게 평가할까요?</h3><p class="muted">AI 추천: ${RATINGS[judge(first.question,first.answer)==='weird'?0:2]}</p><div class="rating-grid">${RATINGS.map((v,i)=>`<button onclick="window.rateAnswer(${i})">${v}<br><small>${i===0?'1칸 아래 · 새 질문':i===1?'그대로 · 같은 질문':i===2?'1칸 위 · 새 질문':'2칸 위 · 새 질문'}</small></button>`).join('')}</div></div>`;
+  return `<div class="question-card"><span class="pill">평가 차례</span><h3>${esc(first.question)}</h3><p><b>참가자의 답변</b><br>${esc(first.answer)}</p><h3>어떻게 평가할까요?</h3><div class="rating-grid">${RATINGS.map((v,i)=>`<button onclick="window.rateAnswer(${i})">${v}<br><small>${i===0?'1칸 아래 · 새 질문':i===1?'그대로 · 같은 질문':i===2?'1칸 위 · 새 질문':'2칸 위 · 새 질문'}</small></button>`).join('')}</div></div>`;
  }
  if(mine&&!mine.answer)return `<div class="question-card"><span class="pill">${mine.re?'재질문':'랜덤 질문'}</span><h3>${esc(mine.question)}</h3><textarea id="qanswer" maxlength="180" placeholder="답변을 입력하세요"></textarea><button style="margin-top:8px" onclick="window.submitAnswer()">답변 보내기</button> ${swapBtn()}<p class="muted">${posInfo()}</p></div>`;
  if(mine)return `<div class="notice">답변을 보냈어요. 왕의 평가를 기다리는 중입니다.</div><p class="muted">${posInfo()}</p>`;
