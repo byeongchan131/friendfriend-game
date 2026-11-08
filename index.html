@@ -42,7 +42,7 @@ function safeText(v,max=90){return String(v||'').trim().slice(0,max)}
 const kname=()=>state?.players?.[state.kingUid]?.name||'왕';
 function promptHtml(){return Object.entries(QCATS).map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(q=>`<option>${esc(q.replace(/\{k\}/g,kname()))}</option>`).join('')}</optgroup>`).join('')}
 function playerChip(p){return `<span class="avatar"><i style="background:${COLORS[p.color]||COLORS[0]}"></i>${esc(p.name)}</span>`}
-const VERSION='v1.2';
+const VERSION='v1.3';
 const CATS=[
  {k:['음식','먹','메뉴','간식','디저트','과일','빵','해장','야식','요리','과자','국물','아침'],good:['치킨','떡볶이','삼겹살','김치찌개','라면','초밥','피자','국밥','짜장면','불고기'],bad:['아파트','자동차','에어컨','우산','의자','컴퓨터','냉장고']},
  {k:['색'],good:['파란색','빨간색','초록색','검은색','흰색','분홍색','보라색','노란색'],bad:['월요일','자동차 엔진','아파트']},
@@ -56,15 +56,20 @@ const CATS=[
 const DEF_CAT={good:['그때그때 달라요','잘 모르겠어요','집에서 쉬는 거요','친구랑 노는 거','딱히 없어요','음... 생각해 볼게요'],bad:['아파트','냉장고','의자']};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function catOf(q){return CATS.find(c=>c.k.some(w=>String(q).includes(w)))||DEF_CAT}
-function judge(q,a){return catOf(q).bad.some(b=>String(a).includes(b))?'weird':'ok'}
-function botAnswer(q){const c=catOf(q);return Math.random()<0.85?pick(c.good):pick(c.bad)}
+const SILLY=['그냥 숨쉬기ㅋㅋ','냉장고에 있는 거 다 ㅋㅋ','나 자신 ㅇㅇ','그 주에 본 지렁이','월요일이요 ㅠㅠ','잘 모르겠음 ㅋㅋ 그냥 눈 감고 찍음','고양이 밥','엄마 잔소리 ㅋㅋ','개웃긴 거 ㅋㅋ','아 몰라 배고파'];
+const ENDS=['ㅋㅋ','ㅋㅋㅋ','ㅎㅎ','ㄹㅇ','ㅇㅇ','ㅠㅠ','','',''];
+const MILD=['개','존','ㅈㄴ','완전','씨 진짜'];
+function casual(a){const r=Math.random();if(r<0.25)return pick(MILD)+' '+a;if(r<0.55)return a+' '+pick(ENDS);return a}
+function judge(q,a){const t=String(a);return (SILLY.includes(t)||catOf(q).bad.some(b=>t.includes(b)))?'weird':'ok'}
+function botRate(q,a,mood){const w=judge(q,a)==='weird';if(mood==='picky')return w?pick([0,0,1]):pick([1,1,2,3]);if(mood==='nice')return w?pick([1,1,0]):pick([2,3,3]);return w?pick([0,1]):pick([1,2,3])}
+function botAnswer(q){const c=catOf(q);const r=Math.random();if(r<0.12)return pick(SILLY);if(r<0.2)return pick(c.bad);return casual(pick(c.good))}
 let botBusy={};
 function botTick(){
  if(!state||!roomRef||uid!==state.hostUid||state.phase!=='play')return;
  const P=state.players||{},Q=state.queue||[],kid=state.kingUid;
  if(kid&&P[kid]&&P[kid].bot){
   const it=Q.find(q=>q.answer&&P[q.askerUid]);
-  if(it&&!botBusy['k'+it.id]){botBusy['k'+it.id]=1;const w=judge(it.question,it.answer)==='weird';setTimeout(()=>{delete botBusy['k'+it.id];if(state&&state.phase==='play'&&state.kingUid===kid)rateAnswer(w?pick([0,1]):pick([2,3]))},1500+Math.random()*1500)}
+  if(it&&!botBusy['k'+it.id]){botBusy['k'+it.id]=1;const w=judge(it.question,it.answer)==='weird';setTimeout(()=>{delete botBusy['k'+it.id];if(state&&state.phase==='play'&&state.kingUid===kid)rateAnswer(botRate(it.question,it.answer,(P[kid]||{}).mood))},1500+Math.random()*1500)}
  }
  Object.keys(P).filter(id=>P[id].bot&&id!==kid).forEach(id=>{
   if(botBusy['b'+id])return;
@@ -73,7 +78,7 @@ function botTick(){
   else if(!Q.some(q=>q.askerUid===id)&&P[id].pq){botBusy['b'+id]=1;const q=P[id].pq;setTimeout(()=>{roomRef.transaction(r=>{if(!r||r.phase!=='play')return r;const pl=(r.players||{})[id];if(!pl||!pl.pq||(r.queue||[]).some(x=>x.askerUid===id))return r;pl.pq='';r.queue=r.queue||[];r.queue.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),askerUid:id,question:q,answer:botAnswer(q),re:false});return r}).finally(()=>{delete botBusy['b'+id]})},1200+Math.random()*2000)}
  });
 }
-async function addBot(){if(!roomRef)return;try{const res=await roomRef.transaction(r=>{if(!r||r.phase!=='lobby'||r.hostUid!==uid)return r;const P=r.players||{};if(Object.keys(P).length>=MAX_PLAYERS)return;const used=new Set(Object.values(P).map(p=>p.color));let c=0;while(used.has(c))c++;const names=new Set(Object.values(P).map(p=>p.name));let n=1;while(names.has('봇'+n))n++;P['bot'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)]={name:'봇'+n,color:c,ready:true,position:0,bot:true};r.players=P;return r});if(!res.committed)flash('방이 가득 찼어요.')}catch(e){fail(e)}}
+async function addBot(){if(!roomRef)return;try{const res=await roomRef.transaction(r=>{if(!r||r.phase!=='lobby'||r.hostUid!==uid)return r;const P=r.players||{};if(Object.keys(P).length>=MAX_PLAYERS)return;const used=new Set(Object.values(P).map(p=>p.color));let c=0;while(used.has(c))c++;const names=new Set(Object.values(P).map(p=>p.name));let n=1;while(names.has('봇'+n))n++;P['bot'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)]={name:'봇'+n,color:c,ready:true,position:0,bot:true,mood:pick(['picky','normal','nice'])};r.players=P;return r});if(!res.committed)flash('방이 가득 찼어요.')}catch(e){fail(e)}}
 async function removeBot(){if(!roomRef)return;try{await roomRef.transaction(r=>{if(!r||r.phase!=='lobby'||r.hostUid!==uid)return r;const P=r.players||{};const b=Object.keys(P).filter(k=>P[k].bot);if(!b.length)return r;delete P[b[b.length-1]];r.players=P;return r})}catch(e){fail(e)}}
 function header(){return `<div class="topbar"><h1 class="brand">👑 프렌드프렌드</h1><span class="pill" style="font-size:11px;opacity:.7">${VERSION}</span></div>`}
 function homeView(){const pre=new URLSearchParams(location.search).get('room')||'';return `${header()}<p class="sub">왕의 마음을 읽고, 평가를 받아 꼭대기까지 올라가세요!</p><section class="panel"><div class="field"><label>닉네임 (최대 2글자)</label><input id="nickname" maxlength="2" placeholder="닉네임" value="${esc(nickname)}" oninput="window.setNick(this.value)"></div><div class="field"><label>아바타 색상</label><div class="colors">${COLORS.map((c,i)=>`<button class="swatch" style="background:${c}" aria-label="색상 ${i+1}" aria-pressed="${i===color}" onclick="window.setColor(${i})"></button>`).join('')}</div></div><div class="row"><button onclick="window.createRoom()">방 만들기</button></div><div class="field"><label>방 코드로 입장</label><div class="row"><input id="joincode" maxlength="4" placeholder="방 코드 4자리" value="${esc(pre)}"><button class="fit" onclick="window.goJoin()">다음</button></div></div>${notice?`<p class="error">${esc(notice)}</p>`:''}<p class="muted">최대 8명 · 로그인 없이 참여 · 초대 링크 공유 가능</p></section>`}
