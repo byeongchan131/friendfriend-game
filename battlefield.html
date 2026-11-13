@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>전선 : 캠페인 v0.2</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#card{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,10,8,.9);color:#e8e2c8;text-align:center;padding:24px;box-sizing:border-box}
+#card h1{font-size:28px;margin:0 0 10px;letter-spacing:3px}
+#card .tag{color:#b8a86a;font-size:14px;margin-bottom:14px}
+#card p{margin:8px 0;max-width:520px;line-height:1.6;font-size:16px}
+#card button{margin-top:18px;padding:14px 28px;font-size:18px;font-weight:700;border:0;border-radius:10px;background:#7a6a2a;color:#fff7dc;cursor:pointer}
+.hidden{display:none!important}
+#ver{position:fixed;right:10px;top:8px;color:#fff6;font-size:12px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ver">v0.2</div>
+<div id="card">
+  <div class="tag" id="ctag">작전 브리핑</div>
+  <h1 id="ctitle">전선</h1>
+  <p id="ctext"></p>
+  <button id="cbtn">계속</button>
+</div>
+<script>
+(() => {
+'use strict';
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const card = document.getElementById('card');
+
+// ---------- 지도 (1 = 벽) ----------
+const MAPS = {
+town: [
+'1111111111111111','1000000000000001','1011110000111101','1010000000001101','1010111100001101','1000100000000001',
+'1000100111100001','1000000100000001','1110000100111101','1000000000000001','1011000011000101','1010000010000101',
+'1010111110111101','1000000000000001','1000000000000001','1111111111111111'],
+facility: [
+'1111111111111111','1000001000000101','1011101011110101','1010001000010101','1010111110010101','1000000000010001',
+'1111101110010111','1000001010000001','1011101010111101','1010000000100001','1010111110100101','1000100000100101',
+'1011101111100101','1000000000000001','1000000000000001','1111111111111111'],
+beach: [
+'1111111111111111','1000000000000001','1000110000011001','1000110000011001','1000000000000001','1000000100000001',
+'1111000100011101','1000000000000001','1011110000011101','1000000000000001','1000011111000001','1000000000000001',
+'1011000000011101','1000000000000001','1000000000000001','1111111111111111']
+};
+let MAP = MAPS.town;
+const MW = 16, MH = 16;
+const wall = (x, y) => x < 0 || y < 0 || x >= MW || y >= MH || MAP[y | 0][x | 0] === '1';
+
+// ---------- 캠페인 ----------
+const MISSIONS = [
+ { map:'town', title:'1. 새벽의 국경선',
+   brief:'새벽 다섯 시, 북방군이 국경을 넘었다. 전선이 무너지기 전에 마을 외곽을 90초 동안 지켜라. 보급이 올 때까지 버텨야 한다.',
+   obj:{type:'survive', t:90}, text:'마을 외곽을 90초 동안 지키세요' },
+ { map:'town', title:'2. 함락',
+   brief:'방어선이 뚫렸다. 마을은 함락되었고 생존자는 남쪽 역으로 철수해야 한다. 추격을 따돌리며 역 출구까지 가라.',
+   obj:{type:'reach', x:14.5, y:14.5, r:1.4}, text:'남쪽 역 출구까지 도달하세요' },
+ { map:'facility', title:'3. 역습',
+   brief:'아군 전차대가 도심으로 되돌아왔다. 골목에 숨은 적을 소탕하며 도심을 되찾아라. 적 15명을 처치하면 된다.',
+   obj:{type:'kill', n:15}, text:'적 15명을 처치하세요' },
+ { map:'facility', title:'4. 잠입',
+   brief:'적은 도심 전력 시설에서 전차 지원을 막고 있다. 발전기 두 곳을 무력화할 때까지 시설 안에서 버텨야 한다. 한 곳에 2초 이상 머물면 작업이 진행된다.',
+   obj:{type:'interact', pts:[{x:2.5,y:12.5},{x:13.5,y:2.5}], hold:2}, text:'발전기 2곳을 무력화하세요' },
+ { map:'beach', title:'5. 해안 돌파',
+   brief:'해안으로 상륙했다. 참호를 정리하고 해안 벙커까지 전진하라. 적 12명을 처치한 뒤 벙커 입구에 도달해야 한다.',
+   obj:{type:'kill', n:12, then:{type:'reach', x:13.5, y:3.5, r:1.4}}, text:'적 12명을 처치하고 벙커에 도달하세요' },
+ { map:'beach', title:'6. 사령부',
+   brief:'적 지휘부가 해안 사령부에 모여 있다. 증원이 도착할 때까지 180초 동안 사령부를 지켜라. 마지막 전투다.',
+   obj:{type:'survive', t:180}, text:'사령부를 180초 동안 지키세요' }
+];
+const STORY_END = '사령부는 지켜졌다. 북방군의 침공은 멈췄고, 우리는 다시 우리 땅을 되찾았다. 그러나 전쟁은 아직 끝나지 않았다.';
+
+// ---------- 상태 ----------
+const P = { x: 2.5, y: 2.5, a: 0, hp: 100, ammo: 30, reloading: 0, shootCd: 0, flash: 0, hitFlash: 0 };
+let mi = 0, enemies = [], objs = [], kills = 0, running = false, over = false;
+let spawnT = 0, objProgress = 0, phaseThen = null, timeLeft = 0, W = 0, H = 0, zbuf = [];
+const keys = {};
+const joy = { active: false, id: null, cx: 0, cy: 0, dx: 0, dy: 0 };
+const look = { id: null, lx: 0 };
+let fireHeld = false;
+const btnFire = { x: 0, y: 0, r: 58 }, btnReload = { x: 0, y: 0, r: 40 };
+
+function resize() {
+  W = cv.width = innerWidth * devicePixelRatio;
+  H = cv.height = innerHeight * devicePixelRatio;
+  const d = devicePixelRatio;
+  btnFire.x = W - 110 * d; btnFire.y = H - 130 * d; btnFire.r = 62 * d;
+  btnReload.x = W - 110 * d; btnReload.y = H - 260 * d; btnReload.r = 42 * d;
+}
+addEventListener('resize', resize); resize();
+
+function freeSpot(minDist) {
+  let x, y, t = 0;
+  do { x = 1.5 + Math.random() * (MW - 3); y = 1.5 + Math.random() * (MH - 3); t++; }
+  while ((wall(x, y) || Math.hypot(x - P.x, y - P.y) < minDist) && t < 300);
+  return { x, y };
+}
+function makeEnemy(heavy) {
+  const s = freeSpot(6);
+  return heavy
+    ? { x: s.x, y: s.y, hp: 160, max: 160, heavy: true, cd: 2 + Math.random() * 2, alive: true, hitT: 0, speed: 0.45 }
+    : { x: s.x, y: s.y, hp: 60, max: 60, heavy: false, cd: 1 + Math.random() * 2, alive: true, hitT: 0, speed: 0.7 + Math.random() * 0.2 };
+}
+
+function card_show(tag, title, text, btn, onNext) {
+  running = false;
+  document.getElementById('ctag').textContent = tag;
+  document.getElementById('ctitle').textContent = title;
+  document.getElementById('ctext').textContent = text;
+  const b = document.getElementById('cbtn');
+  b.textContent = btn;
+  b.onclick = () => { card.classList.add('hidden'); onNext && onNext(); };
+  card.classList.remove('hidden');
+}
+
+function startMission(idx) {
+  mi = idx;
+  const M = MISSIONS[idx];
+  MAP = MAPS[M.map];
+  P.x = 2.5; P.y = 2.5; P.a = 0; P.hp = 100; P.ammo = 30; P.reloading = 0; P.shootCd = 0;
+  enemies = []; kills = 0; over = false; spawnT = 0; objProgress = 0; objs = [];
+  const o = M.obj;
+  if (o.type === 'survive') timeLeft = o.t;
+  if (o.type === 'reach') objs.push({ kind: 'exit', x: o.x, y: o.y });
+  if (o.type === 'interact') o.pts.forEach(p => objs.push({ kind: 'gen', x: p.x, y: p.y, prog: 0, done: false }));
+  if (o.type === 'kill' && o.then) phaseThen = o.then; else phaseThen = null;
+  for (let i = 0; i < 4 + idx; i++) enemies.push(makeEnemy(idx >= 3 && i % 4 === 0));
+  card.classList.add('hidden');
+  running = true;
+}
+
+function briefing(idx) {
+  const M = MISSIONS[idx];
+  card_show('작전 ' + (idx + 1) + ' / ' + MISSIONS.length, M.title, M.brief + '\n\n목표: ' + M.text, '출격', () => startMission(idx));
+}
+
+function missionComplete() {
+  running = false;
+  const next = mi + 1;
+  if (next >= MISSIONS.length) {
+    card_show('캠페인 종료', '사령부 수호', STORY_END + '\n\n처치 ' + kills + '명', '처음부터 다시', () => { mi = 0; briefing(0); });
+  } else {
+    P.hp = Math.min(100, P.hp + 40);
+    card_show('작전 완료', MISSIONS[mi].title, '보급이 도착했다. 체력이 조금 회복되었다.\n\n다음 작전을 준비하라.', '다음 작전', () => briefing(next));
+  }
+}
+function missionFailed() {
+  running = false;
+  card_show('작전 실패', MISSIONS[mi].title, '부대가 무너졌다. 같은 작전을 다시 시작한다.', '재시도', () => startMission(mi));
+}
+
+// ---------- 레이캐스트 ----------
+function castRay(angle) {
+  const rx = Math.cos(angle), ry = Math.sin(angle);
+  let mx = Math.floor(P.x), my = Math.floor(P.y);
+  const dx = Math.abs(1 / (rx || 1e-9)), dy = Math.abs(1 / (ry || 1e-9));
+  let sx, sy, sdx, sdy;
+  if (rx < 0) { sx = -1; sdx = (P.x - mx) * dx; } else { sx = 1; sdx = (mx + 1 - P.x) * dx; }
+  if (ry < 0) { sy = -1; sdy = (P.y - my) * dy; } else { sy = 1; sdy = (my + 1 - P.y) * dy; }
+  let side = 0;
+  for (let i = 0; i < 64; i++) {
+    if (sdx < sdy) { sdx += dx; mx += sx; side = 0; } else { sdy += dy; my += sy; side = 1; }
+    if (MAP[my] && MAP[my][mx] === '1') {
+      const dist = side === 0 ? (mx - P.x + (1 - sx) / 2) / (rx || 1e-9) : (my - P.y + (1 - sy) / 2) / (ry || 1e-9);
+      return { dist: Math.abs(dist), side, mx, my };
+    }
+  }
+  return { dist: 64, side: 0, mx: 0, my: 0 };
+}
+
+// ---------- 그리기 ----------
+function drawSprite(sx, sh, depth, col, label, hpFrac) {
+  const bright = Math.max(0.3, 1 - depth / 14);
+  ctx.fillStyle = `rgb(${col[0]*bright|0},${col[1]*bright|0},${col[2]*bright|0})`;
+  ctx.fillRect(sx - sh * 0.18, H / 2 - sh * 0.1, sh * 0.36, sh * 0.62);
+  ctx.beginPath(); ctx.arc(sx, H / 2 - sh * 0.2, sh * 0.13, 0, Math.PI * 2); ctx.fill();
+  if (hpFrac !== undefined) {
+    ctx.fillStyle = '#000a'; ctx.fillRect(sx - sh * 0.2, H / 2 - sh * 0.4, sh * 0.4, 5 * devicePixelRatio);
+    ctx.fillStyle = '#c33'; ctx.fillRect(sx - sh * 0.2, H / 2 - sh * 0.4, sh * 0.4 * hpFrac, 5 * devicePixelRatio);
+  }
+  if (label) { ctx.fillStyle = '#fff'; ctx.font = `${12*devicePixelRatio}px system-ui`; ctx.textAlign = 'center'; ctx.fillText(label, sx, H / 2 - sh * 0.5); ctx.textAlign = 'left'; }
+}
+
+function draw() {
+  const hz = H / 2;
+  const sky = ctx.createLinearGradient(0, 0, 0, hz);
+  sky.addColorStop(0, '#2b3a4a'); sky.addColorStop(1, '#8a7f5e');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, hz);
+  const gnd = ctx.createLinearGradient(0, hz, 0, H);
+  gnd.addColorStop(0, '#4a4a2e'); gnd.addColorStop(1, '#22190f');
+  ctx.fillStyle = gnd; ctx.fillRect(0, hz, W, H - hz);
+
+  const cols = 160, cw = W / cols, fov = Math.PI / 3;
+  for (let i = 0; i < cols; i++) {
+    const ang = P.a - fov / 2 + (i / cols) * fov;
+    const r = castRay(ang);
+    const corr = r.dist * Math.cos(ang - P.a);
+    zbuf[i] = corr;
+    const h = Math.min(H * 1.2, H / Math.max(corr, 0.05));
+    const shade = Math.max(0.15, 1 - corr / 12) * (r.side ? 0.7 : 1);
+    const v = (r.mx * 37 + r.my * 91) % 3;
+    const base = v === 0 ? [120, 102, 74] : v === 1 ? [96, 90, 70] : [110, 96, 80];
+    ctx.fillStyle = `rgb(${base[0]*shade|0},${base[1]*shade|0},${base[2]*shade|0})`;
+    ctx.fillRect(i * cw, hz - h / 2, cw + 1, h);
+  }
+
+  const items = [];
+  for (const e of enemies) if (e.alive) items.push({ kind: 'e', o: e, x: e.x, y: e.y });
+  for (const o of objs) if (!(o.kind === 'gen' && o.done)) items.push({ kind: 'o', o, x: o.x, y: o.y });
+  items.forEach(it => { it.dx = it.x - P.x; it.dy = it.y - P.y; it.d = Math.hypot(it.dx, it.dy); });
+  items.sort((a, b) => b.d - a.d);
+  for (const it of items) {
+    const ang = Math.atan2(it.dy, it.dx) - P.a;
+    let da = ang; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+    if (Math.abs(da) > Math.PI / 2 + 0.2) continue;
+    const depth = it.d * Math.cos(da);
+    if (depth < 0.3) continue;
+    const sx = (0.5 + da / (Math.PI / 3)) * W;
+    const col = Math.floor(sx / (W / cols));
+    if (zbuf[col] !== undefined && zbuf[col] < depth) continue;
+    const sh = Math.min(H * 0.9, H / depth) * 0.9;
+    if (it.kind === 'e') {
+      const e = it.o, hit = e.hitT > 0;
+      const c = hit ? [240, 120, 80] : e.heavy ? [60, 60, 90] : [80, 70, 60];
+      drawSprite(sx, sh * (e.heavy ? 1.15 : 1), depth, c, null, Math.max(0, e.hp / e.max));
+    } else {
+      const o = it.o;
+      const c = o.kind === 'exit' ? [200, 180, 60] : [90, 160, 200];
+      drawSprite(sx, sh * 0.9, depth, c, o.kind === 'exit' ? '출구' : '발전기 ' + Math.round(o.prog / MISSIONS[mi].obj.hold * 100) + '%');
+    }
+  }
+
+  if (P.flash > 0) { ctx.fillStyle = `rgba(255,200,90,${P.flash})`; ctx.beginPath(); ctx.arc(W * 0.62, H * 0.78, H * 0.07, 0, Math.PI * 2); ctx.fill(); }
+  ctx.strokeStyle = '#fff9'; ctx.lineWidth = 2 * devicePixelRatio;
+  const c = 10 * devicePixelRatio;
+  ctx.beginPath(); ctx.moveTo(W/2 - c, H/2); ctx.lineTo(W/2 - 3, H/2); ctx.moveTo(W/2 + 3, H/2); ctx.lineTo(W/2 + c, H/2);
+  ctx.moveTo(W/2, H/2 - c); ctx.lineTo(W/2, H/2 - 3); ctx.moveTo(W/2, H/2 + 3); ctx.lineTo(W/2, H/2 + c); ctx.stroke();
+  if (P.hitFlash > 0) { ctx.fillStyle = `rgba(180,0,0,${P.hitFlash * 0.5})`; ctx.fillRect(0, 0, W, H); }
+  drawHUD(); drawControls();
+}
+
+function drawHUD() {
+  const d = devicePixelRatio, pad = 14 * d;
+  ctx.fillStyle = '#0008'; ctx.fillRect(pad, pad, 230 * d, 84 * d);
+  ctx.fillStyle = '#e8e2c8'; ctx.font = `${16*d}px system-ui`;
+  ctx.fillText(`체력 ${Math.max(0, P.hp|0)}`, pad + 10 * d, pad + 24 * d);
+  ctx.fillStyle = '#333'; ctx.fillRect(pad + 10 * d, pad + 34 * d, 210 * d, 10 * d);
+  ctx.fillStyle = P.hp > 30 ? '#6c6' : '#d44'; ctx.fillRect(pad + 10 * d, pad + 34 * d, 210 * d * Math.max(0, P.hp) / 100, 10 * d);
+  ctx.fillStyle = '#e8e2c8';
+  ctx.fillText(`탄 ${P.reloading > 0 ? '재장전' : P.ammo}`, pad + 10 * d, pad + 64 * d);
+  ctx.fillText(`처치 ${kills}`, pad + 110 * d, pad + 64 * d);
+
+  const M = MISSIONS[mi];
+  let obj = M.text;
+  if (M.obj.type === 'survive') obj += ` (${Math.ceil(timeLeft)}초)`;
+  if (M.obj.type === 'kill') obj += ` (${kills}/${M.obj.n})`;
+  if (M.obj.type === 'interact') obj += ` (${objs.filter(o => o.done).length}/${objs.length})`;
+  ctx.font = `${13*d}px system-ui`;
+  const tw = Math.min(W * 0.55, ctx.measureText(obj).width + 24 * d);
+  ctx.fillStyle = '#0008'; ctx.fillRect(W / 2 - tw / 2, pad, tw, 30 * d);
+  ctx.fillStyle = '#f0e6b0'; ctx.textAlign = 'center'; ctx.fillText(obj, W / 2, pad + 20 * d); ctx.textAlign = 'left';
+  ctx.font = `${16*d}px system-ui`;
+}
+
+function drawControls() {
+  const d = devicePixelRatio;
+  ctx.globalAlpha = 0.35;
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(120 * d, H - 150 * d, 70 * d, 0, Math.PI * 2); ctx.fill();
+  const kx = 120 * d + joy.dx * 50 * d, ky = H - 150 * d + joy.dy * 50 * d;
+  ctx.beginPath(); ctx.arc(kx, ky, 30 * d, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.fillStyle = '#a33'; ctx.arc(btnFire.x, btnFire.y, btnFire.r, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.fillStyle = '#558'; ctx.arc(btnReload.x, btnReload.y, btnReload.r, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#fff'; ctx.font = `${16*d}px system-ui`; ctx.textAlign = 'center';
+  ctx.fillText('사격', btnFire.x, btnFire.y + 6 * d);
+  ctx.fillText('재장전', btnReload.x, btnReload.y + 6 * d);
+  ctx.textAlign = 'left';
+}
+
+// ---------- 전투 ----------
+function fire() {
+  if (P.shootCd > 0 || P.reloading > 0 || over || !running) return;
+  if (P.ammo <= 0) { P.reloading = 1.6; return; }
+  P.ammo--; P.shootCd = 0.14; P.flash = 1;
+  const wallD = zbuf[Math.floor(zbuf.length / 2)] || 64;
+  let best = null, bestD = 1e9;
+  for (const e of enemies) {
+    if (!e.alive) continue;
+    const dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy);
+    let da = Math.atan2(dy, dx) - P.a; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+    if (Math.abs(da) < 0.09 && d < bestD && d < wallD + 0.2) { best = e; bestD = d; }
+  }
+  if (best) {
+    const dmg = Math.max(12, 45 - bestD * 2) * (best.heavy ? 0.6 : 1);
+    best.hp -= dmg; best.hitT = 0.15;
+    if (best.hp <= 0) { best.alive = false; kills++; }
+  }
+}
+
+function update(dt) {
+  P.shootCd = Math.max(0, P.shootCd - dt);
+  P.flash = Math.max(0, P.flash - dt * 6);
+  P.hitFlash = Math.max(0, P.hitFlash - dt * 2);
+  if (P.reloading > 0) { P.reloading -= dt; if (P.reloading <= 0) { P.reloading = 0; P.ammo = 30; } }
+  if (!running || over) return;
+
+  if (keys.ArrowLeft || keys.q) P.a -= dt * 2.2;
+  if (keys.ArrowRight || keys.e) P.a += dt * 2.2;
+  let fx = 0, fy = 0;
+  if (keys.w || keys.ArrowUp) fy += 1;
+  if (keys.s || keys.ArrowDown) fy -= 1;
+  if (keys.a) fx -= 1;
+  if (keys.d) fx += 1;
+  fx += joy.dx; fy += -joy.dy;
+  const mag = Math.min(1, Math.hypot(fx, fy));
+  if (mag > 0.01) {
+    const len = Math.hypot(fx, fy);
+    const sp = 2.4 * dt * mag / len * (len > 0 ? 1 : 0);
+    const cs = Math.cos(P.a), sn = Math.sin(P.a);
+    const mx = (cs * fy - sn * fx) * sp, my = (sn * fy + cs * fx) * sp;
+    const nx = P.x + mx, ny = P.y + my;
+    if (!wall(nx, P.y)) P.x = nx;
+    if (!wall(P.x, ny)) P.y = ny;
+  }
+  if (fireHeld) fire();
+
+  const M = MISSIONS[mi], o = M.obj;
+  // 시간/생성
+  if (o.type === 'survive') { timeLeft -= dt; if (timeLeft <= 0) return missionComplete(); }
+  spawnT -= dt;
+  const cap = 6 + mi * 2;
+  if (spawnT <= 0 && enemies.filter(e => e.alive).length < cap) {
+    spawnT = Math.max(2.5, 6 - mi * 0.5);
+    const n = 1 + (Math.random() < 0.5 ? 1 : 0);
+    for (let i = 0; i < n; i++) enemies.push(makeEnemy(mi >= 3 && Math.random() < 0.2));
+  }
+  // 적 행동
+  for (const e of enemies) {
+    if (!e.alive) continue;
+    e.hitT = Math.max(0, e.hitT - dt);
+    const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy);
+    if (d > 2.2) {
+      const sx = e.x + dx / d * e.speed * dt, sy = e.y + dy / d * e.speed * dt;
+      if (!wall(sx, e.y)) e.x = sx;
+      if (!wall(e.x, sy)) e.y = sy;
+    }
+    e.cd -= dt;
+    if (e.cd <= 0 && d < 14) {
+      e.cd = (e.heavy ? 2 : 1.2) + Math.random() * 1.5;
+      const acc = Math.max(0.2, 1 - d / 16);
+      if (Math.random() < acc) { P.hp -= (4 + mi * 0.8) * (e.heavy ? 2 : 1); P.hitFlash = 1; }
+    }
+  }
+  // 임무 목표
+  if (o.type === 'kill') {
+    if (kills >= o.n) {
+      if (phaseThen) { objs.length = 0; objs.push({ kind: 'exit', x: phaseThen.x, y: phaseThen.y }); phaseThen = null; }
+      else return missionComplete();
+    }
+  }
+  if (o.type === 'reach' || (o.type === 'kill' && objs.length && objs[0].kind === 'exit')) {
+    const ex = objs.find(z => z.kind === 'exit');
+    if (ex && Math.hypot(ex.x - P.x, ex.y - P.y) < (o.r || 1.4)) return missionComplete();
+  }
+  if (o.type === 'interact') {
+    for (const g of objs) {
+      if (g.done) continue;
+      if (Math.hypot(g.x - P.x, g.y - P.y) < 1.3) { g.prog += dt; if (g.prog >= o.hold) g.done = true; }
+    }
+    if (objs.length && objs.every(g => g.done)) return missionComplete();
+  }
+  if (P.hp <= 0) { P.hp = 0; over = true; missionFailed(); }
+}
+
+// ---------- 입력 ----------
+document.getElementById('cbtn').addEventListener('click', () => {});
+addEventListener('keydown', e => {
+  keys[e.key] = true; keys[e.key.toLowerCase()] = true;
+  if (e.key === ' ') { fireHeld = true; e.preventDefault(); }
+  if (e.key.toLowerCase() === 'r' && P.ammo < 30 && P.reloading === 0) P.reloading = 1.6;
+});
+addEventListener('keyup', e => { keys[e.key] = false; keys[e.key.toLowerCase()] = false; if (e.key === ' ') fireHeld = false; });
+function inCircle(x, y, c, r) { return Math.hypot(x - c.x, y - c.y) <= r; }
+cv.addEventListener('pointerdown', e => {
+  const d = devicePixelRatio, x = e.clientX * d, y = e.clientY * d;
+  if (!running) return;
+  if (inCircle(x, y, btnFire, btnFire.r)) { fireHeld = true; joy.id = 'fire'; cv.setPointerCapture(e.pointerId); return; }
+  if (inCircle(x, y, btnReload, btnReload.r)) { if (P.ammo < 30 && P.reloading === 0) P.reloading = 1.6; return; }
+  if (x < W * 0.5) { joy.active = true; joy.id = e.pointerId; joy.cx = 120 * d; joy.cy = H - 150 * d; cv.setPointerCapture(e.pointerId); }
+  else { look.id = e.pointerId; look.lx = x; cv.setPointerCapture(e.pointerId); }
+});
+cv.addEventListener('pointermove', e => {
+  const d = devicePixelRatio, x = e.clientX * d, y = e.clientY * d;
+  if (joy.active && e.pointerId === joy.id) {
+    let dx = (x - joy.cx) / (50 * d), dy = (y - joy.cy) / (50 * d);
+    const m = Math.hypot(dx, dy); if (m > 1) { dx /= m; dy /= m; }
+    joy.dx = dx; joy.dy = dy;
+  }
+  if (look.id === e.pointerId) { P.a += (x - look.lx) / W * 2.8; look.lx = x; }
+});
+function endPointer(e) {
+  if (e.pointerId === joy.id) { joy.active = false; joy.dx = 0; joy.dy = 0; joy.id = null; }
+  if (e.pointerId === look.id) look.id = null;
+  if (joy.id === 'fire') { fireHeld = false; joy.id = null; }
+}
+cv.addEventListener('pointerup', endPointer);
+cv.addEventListener('pointercancel', endPointer);
+cv.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && running) fireHeld = true; });
+cv.addEventListener('pointerup', e => { if (e.pointerType === 'mouse') fireHeld = false; });
+
+// ---------- 시작 ----------
+let last = performance.now();
+function loop(t) {
+  const dt = Math.min(0.05, (t - last) / 1000); last = t;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+briefing(0);
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
